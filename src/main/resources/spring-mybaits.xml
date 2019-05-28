@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                        http://www.springframework.org/schema/tx
+                        http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                         http://www.springframework.org/schema/aop
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                        ">
+    <!-- 自动扫描 -->
+    <!--<context:component-scan base-package="com.yuer.ssm.service" />-->
+    <context:component-scan base-package="com.yuer.ssm.service" />
+    <!-- 引入实现JDBC配置文件 -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:jdbc.properties" />
+    </bean>
+
+
+    <!-- 2.数据库连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 配置连接池属性 -->
+        <!-- 此处 ${Driver} 中的 ${属性名} 是访问属性文件中的指定属性-->
+        <property name="driverClass" value="${driver}" />
+        <property name="jdbcUrl" value="${url}" />
+        <property name="user" value="${username}" />
+        <property name="password" value="${password}" />
+        <!-- c3p0连接池的私有属性 -->
+        <property name="maxPoolSize" value="${maxActive}" />
+        <property name="minPoolSize" value="${minActive}" />
+        <property name="initialPoolSize" value="${initialSize}"/>
+        <!-- 关闭连接后不自动commit -->
+        <property name="autoCommitOnClose" value="${autoCommitOnClose}" />
+        <!-- 获取连接超时时间 -->
+        <property name="checkoutTimeout" value="${maxWait}" />
+        <!-- 当获取连接失败重试次数 -->
+        <property name="acquireRetryAttempts" value="2" />
+    </bean>
+
+    <!-- spring和MyBatis整合，通过spring来管理MyBatis的SqlSessionFactory会话工厂 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--  指定数据库连接池引用 -->
+        <property name="dataSource" ref="dataSource" />
+        <!--  指定mybatis的配置文件路径，该配置文件下不需要再定义数据库连接信息和mapper信息了，但是可以
+        有一些关于mybatis的配置信息-->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!-- 指定mybatis的mapper配置文件路径，*代表通配符所有的意思
+         value可以指定多个，由英文逗号分隔
+         -->
+        <!--<property name="mapperLocations" value="classpath:com/yuer/ssm/mapper/*.xml"></property>-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+
+    <!-- 定义sqlSession对象，通过SqlSessionTemplate来产生，需要在构造方法中指定会话工厂
+     相当于原来mybatis中的sessionFactory.openSession();SqlSessionTemplate是线程安全的，所以采用单例模式
+     -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+        <!--注入会话工厂-->
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+        <!--定义采用何种形式操作数据库，需要注意若是BATCH的话增删改返回的将不是影响的行数
+        默认为SIMPLE-->
+        <!--<constructor-arg index="1" value="BATCH"/>-->
+    </bean>
+
+    <!--
+        定义mybaits的DAO接口所在的包名，spring会自动查找其下的接口，并为其自动创建bean，无需我们定义
+     -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.deng.ssm.dao" />
+        <property name="sqlSessionTemplateBeanName" value="sqlSessionTemplate"/>
+    </bean>
+
+
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- (事务管理)使用注解的方式来管理实务 -->
+    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <!-- 定义事务的切面（通知） -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager" >
+        <tx:attributes >
+            <!-- 定义方法的事务规则 -->
+            <tx:method  name="add*" propagation="REQUIRED" />
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="del*" propagation="REQUIRED"/>
+            <tx:method name="modify*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="NEVER" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--通过AOP启用事务-->
+    <aop:config>
+        <aop:pointcut id="pt" expression="execution(* com.yuer.ssm.serviceimpl.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt" />
+    </aop:config>
+</beans>
