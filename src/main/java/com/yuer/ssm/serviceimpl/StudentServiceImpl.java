@@ -4,6 +4,7 @@ import com.yuer.ssm.bean.Student;
 import com.yuer.ssm.dao.IStudentDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
