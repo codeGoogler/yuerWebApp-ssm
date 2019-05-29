@@ -13,8 +13,9 @@
     <!-- 定义自动扫描包的路径,在此处仅扫描Controller所在的包，如果有多个需要逗号分隔。
     需要注意：此处扫描和spring的自动扫描的包不要出现重叠
     -->
-    <!--<context:component-scan base-package="com.yuer.ssm.controller"/>-->
     <context:component-scan base-package="com.yuer.ssm.controller"/>
+    <!--<context:component-scan base-package="com.yuer.ssm.controller"/>
+    <context:component-scan base-package="com.yuer.ssm.dao"/>-->
     <!-- spring 3.2版本之后可以不用配置 -->
     <context:annotation-config/>
     <!-- 在springMVC-servlet.xml中配置<mvc:default-servlet-handler />后，会在Spring MVC上下文中定义一个
@@ -50,7 +51,7 @@
     则该该jsp视图页面应该存放在“WEB-INF/jsp/hello.jsp”；-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="prefix" value="/WEB-INF/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 

@@ -8,14 +8,14 @@ https://www.cnblogs.com/dengcl/p/7595160.html
 **解决IntelliJ IDEA 创建Maven项目速度慢问题**：
 https://www.cnblogs.com/huahua035/p/6954152.html
 
+**IDEA中的maven web 项目中如何设置自己的本地仓库**
+https://www.cnblogs.com/1314wamm/p/7476199.html
 
 对时下互联网项目的三个主流框架进行整合开发，MyBatis作为模型层、SpringMVC 作为控制层、Spring作为整个各层输出、粘合作用的解决方案。
 
 
 
 #### 第一步，创建Maven项目，导入依赖
-
-
 
 
 #### 第二步，生成实体类和映射文件
