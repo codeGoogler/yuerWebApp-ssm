@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--  注意命名空间为该maper文件对应的DAO的全路径 -->
+<mapper namespace="com.yuer.ssm.dao.IStudentDAO" >
+
+    <!--定义resultmap
+        type的值为Student实体类名称，因为指定包的别名所以不用全路径
+        -->
+    <resultMap id="student_map" type="Student">
+        <id property="id" column="id"/>
+        <result property="stuName" column="stuName"/>
+        <result property="stuAge" column="stuAge"/>
+        <result property="mobile" column="mobile"/>
+        <result property="address" column="address"/>
+        <result property="entranceTime" column="entranceTime"/>
+    </resultMap>
+
+    <!--需要注意id的值等于接口中方法的名字-->
+    <select id="searchAll" resultMap="student_map">
+        select id,stuName, stuAge, mobile, address, EntranceTime
+        from student
+    </select>
+</mapper>
